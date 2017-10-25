@@ -24,10 +24,11 @@ namespace HashiCorp.Vault.Authentication.Token {
 
         public DefaultVaultService VaultService { get; }
 
-        public async Task<SecureString> AuthenticateAsync() {
-            var response = await VaultService.ReadSecretAsync($"auth/token/lookup/{_vaultToken.ToUnicodeString()}").ConfigureAwait(false);
-            var authBundle = response.Data.ToObject<AuthBundle>();
-            return authBundle.Token.ToSecureString();
+        public Task<SecureString> AuthenticateAsync() {
+            return Task.FromResult(_vaultToken);
+            //var response = await VaultService.ReadSecretAsync($"auth/token/lookup/{_vaultToken.ToUnicodeString()}").ConfigureAwait(false);
+            //var authBundle = response.Data.ToObject<AuthBundle>();
+            //return authBundle.Token.ToSecureString();
         }
 
     }

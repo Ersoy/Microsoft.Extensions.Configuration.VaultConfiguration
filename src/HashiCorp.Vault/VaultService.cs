@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using HashiCorp.Vault.Authentication;
 using HashiCorp.Vault.Models;
+using HashiCorp.Vault.Utilities;
 using Newtonsoft.Json;
 
 namespace HashiCorp.Vault {
@@ -13,11 +14,6 @@ namespace HashiCorp.Vault {
 
         public VaultService(Uri vaultAddress) 
             : base(vaultAddress) {
-        }
-
-        /// <inheritdoc />
-        public override async Task AuthenticateAsync(IVaultAuthentication vaultAuthentication) {
-            AuthToken = await vaultAuthentication.AuthenticateAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />

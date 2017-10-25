@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security;
-using System.Security.Authentication;
 using System.Threading.Tasks;
 using HashiCorp.Vault.Authentication;
 using HashiCorp.Vault.Models;
@@ -32,8 +32,20 @@ namespace HashiCorp.Vault {
         protected SecureString AuthToken { get; set; }
 
         /// <inheritdoc />
-        public abstract Task AuthenticateAsync(IVaultAuthentication vaultAuthentication);
-        
+        public virtual async Task AuthenticateAsync(IVaultAuthentication vaultAuthentication) {
+            AuthToken = await vaultAuthentication.AuthenticateAsync().ConfigureAwait(false);
+            try {
+                var response = await ReadSecretAsync($"auth/token/lookup-self").ConfigureAwait(false);
+                var authBundle = response.Data.ToObject<AuthBundle>();
+                if (authBundle.Token != AuthToken.ToUnicodeString()) {
+                    Debug.Assert(authBundle.Token == AuthToken.ToUnicodeString());
+                }
+            }
+            catch (HttpException e) {
+                throw new HttpException(e.StatusCode, "Invalid token.", e);
+            }
+        }
+
         /// <inheritdoc />
         public abstract Task<SecretBundle> ReadSecretAsync(string path, object payload = null);
 
@@ -49,17 +61,21 @@ namespace HashiCorp.Vault {
         /// <inheritdoc />
         public abstract Task<VaultHealthStatus> HealthStatusAsync();
 
-        protected virtual async Task<HttpResponseMessage> GetAsync(string request) {
-            if (string.IsNullOrWhiteSpace(request)) {
+        protected virtual Task<HttpResponseMessage> GetAsync(string request) => InvokeAsync(() => Client.GetAsync(request));
+
+        protected virtual Task<HttpResponseMessage> PostAsync(string request, HttpContent payload) => InvokeAsync(() => Client.PostAsync(request, payload));
+
+        protected virtual async Task<HttpResponseMessage> InvokeAsync(Func<Task<HttpResponseMessage>> request) {
+            if (request == null) {
                 throw new ArgumentNullException(nameof(request));
             }
-
+            
             try {
                 if (AuthToken != null) {
                     Client.DefaultRequestHeaders.Add(XVaultToken, AuthToken.ToUnicodeString());
                 }
-                
-                var response = await Client.GetAsync(request).ConfigureAwait(false);
+
+                var response = await request().ConfigureAwait(false);
 
                 if (!response.IsSuccessStatusCode) {
                     var json = await response.Content.ReadAsStringAsync();
@@ -68,45 +84,10 @@ namespace HashiCorp.Vault {
                     var errors = r["errors"]?.Any() == true ? r["errors"] : null;
 
                     if (errors?[0].ToString() == "missing client token") {
-                        throw new AuthenticationException(
-                            "Not authenticated (AuthenticateAsync is not invoked before making this request) to Vault.");
+                        throw new HttpException(response.StatusCode, "Not authenticated (AuthenticateAsync is not invoked before making this request) to Vault.");
                     }
                     if (response.StatusCode == HttpStatusCode.Forbidden) {
-                        throw new HttpRequestException(errors?[0].ToString());
-                    }
-                }
-
-                return response;
-            }
-            finally {
-                Client.DefaultRequestHeaders.Remove(XVaultToken);
-            }
-        }
-
-        protected virtual async Task<HttpResponseMessage> PostAsync(string request, HttpContent payload) {
-            if (string.IsNullOrWhiteSpace(request)) {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            try {
-                if (AuthToken != null) {
-                    Client.DefaultRequestHeaders.Add(XVaultToken, AuthToken.ToUnicodeString());
-                }
-                
-                var response = await Client.PostAsync(request, payload).ConfigureAwait(false);
-
-                if (!response.IsSuccessStatusCode) {
-                    var json = await response.Content.ReadAsStringAsync();
-                    var r = JsonConvert.DeserializeObject<JObject>(json);
-
-                    var errors = r["errors"]?.Any() == true ? r["errors"] : null;
-
-                    if (errors?[0].ToString() == "missing client token") {
-                        throw new AuthenticationException(
-                            "Not authenticated (AuthenticateAsync is not invoked before making this request) to Vault.");
-                    }
-                    if (response.StatusCode == HttpStatusCode.Forbidden) {                        
-                        throw new HttpRequestException(errors?[0].ToString());
+                        throw new HttpException(response.StatusCode, errors?[0].ToString());
                     }
                 }
 

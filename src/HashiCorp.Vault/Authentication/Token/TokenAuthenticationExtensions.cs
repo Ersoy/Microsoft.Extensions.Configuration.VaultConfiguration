@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace HashiCorp.Vault.Authentication.Token {
 
     public static class TokenAuthenticationExtensions {

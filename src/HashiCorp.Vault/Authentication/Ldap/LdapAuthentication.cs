@@ -6,7 +6,7 @@ using HashiCorp.Vault.Models;
 using HashiCorp.Vault.Utilities;
 using Newtonsoft.Json;
 
-namespace HashiCorp.Vault.Authentication {
+namespace HashiCorp.Vault.Authentication.Ldap {
 
     /// <summary>
     /// Represents the LDAP authentication.
