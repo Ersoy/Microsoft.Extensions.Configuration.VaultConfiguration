@@ -22,13 +22,13 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
 
         public override void Load() {
             var secrets = ReadSecrets().Result;
-            Load(secrets).GetAwaiter().GetResult();
+            Load(secrets).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         private async Task Load(IEnumerable<string> secrets) {
             Data = new Dictionary<string, string>();
             foreach (var secret in secrets) {
-                var result = await Service.ReadSecretDataAsync(secret);                
+                var result = await Service.ReadSecretDataAsync(secret).ConfigureAwait(false);
                 Data.Add(DenormalizePath(secret), JsonConvert.SerializeObject(result));
             }
         }
@@ -39,15 +39,16 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
             return secrets;
         }
 
-        private async Task ReadSecrets(IList<string> secrets, string path) {
-            var result = await Service.ListAsync(path);
+        private async Task ReadSecrets(ICollection<string> secrets, string path) {
+            var result = await Service.ListAsync(path).ConfigureAwait(false);
 
             foreach (var secret in result) {
-                if (secret.EndsWith("/")) {
-                    await ReadSecrets(secrets, $"{path}/{secret.TrimEnd('/')}");
+                if (secret.EndsWith(VaultPath.PathDelimiter)) {
+                    var readPath = VaultPath.Combine(path, secret);
+                    await ReadSecrets(secrets, readPath).ConfigureAwait(false);
                 }
                 else {
-                    secrets.Add($"{path}/{secret}");
+                    secrets.Add(VaultPath.Combine(path, secret));
                 }
             }
         }
@@ -64,10 +65,6 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
             return string.IsNullOrWhiteSpace(path) ? path : path.Replace(VaultPath.PathDelimiter, ConfigurationPath.KeyDelimiter);
         }
 
-    }
-
-    public class VaultPath {
-        public static readonly string PathDelimiter = "/";
     }
 
 }
