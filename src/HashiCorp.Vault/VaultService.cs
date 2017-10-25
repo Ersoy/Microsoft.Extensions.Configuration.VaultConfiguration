@@ -21,20 +21,15 @@ namespace HashiCorp.Vault {
         }
 
         /// <inheritdoc />
-        public override async Task<IDictionary<string, string>> ReadSecretDataAsync(string path) {
-            var secretValue = await ReadSecretAsync(path).ConfigureAwait(false);
-            return secretValue.Data.ToObject<Dictionary<string, string>>();
+        public override Task<SecretBundle> ReadSecretAsync(string path, object payload = null) {
+            return RequestSecret(path, payload);
         }
 
         /// <inheritdoc />
-        public override Task<SecretBundle> ReadSecretAsync(string path) {
-            return RequestSecret(path);
+        public override Task<SecretBundle<T>> ReadSecretAsync<T>(string path, object payload = null) {
+            return RequestSecret<T>(path, payload);
         }
-
-        public override Task<SecretBundle<T>> ReadSecretAsync<T>(string path) {
-            return RequestSecret<T>(path);
-        }
-
+        
         /// <inheritdoc />
         public override async Task<IEnumerable<string>> ListAsync(string path) {
             var secretValue = await RequestSecret(path + "?list=true").ConfigureAwait(false);
@@ -43,7 +38,7 @@ namespace HashiCorp.Vault {
         }
 
         public override async Task<HealthBundle> HealthAsync() {
-            var response = await Request("sys/health");
+            var response = await GetAsync("sys/health");
             var contentAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var result = JsonConvert.DeserializeObject<HealthBundle>(contentAsString);
             return result;
@@ -52,7 +47,7 @@ namespace HashiCorp.Vault {
         /// <inheritdoc />
         public override async Task<VaultHealthStatus> HealthStatusAsync() {
             try {
-                var result = await Request("sys/health");
+                var result = await GetAsync("sys/health");
                 var statusCode = (int)result.StatusCode;
                 return (VaultHealthStatus)statusCode;
             }

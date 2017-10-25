@@ -4,6 +4,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using HashiCorp.Vault;
 using HashiCorp.Vault.Authentication;
+using HashiCorp.Vault.Authentication.Token;
 using Xunit;
 
 namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.IntegrationTests {
@@ -41,20 +42,19 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.Integratio
 
         [Fact]
         public async Task AuthInvalidTokenThrows() {
-            var vault = VaultService();
-            await vault.AuthenticateAsync(new TokenAuthentication(Guid.NewGuid().ToString()));
+            var randomlyGeneretedInvalidToken = Guid.NewGuid().ToString();
+            var vault = VaultService().AuthenticateUsingToken(randomlyGeneretedInvalidToken);
             var exc = await Assert.ThrowsAsync<HttpRequestException>(() => vault.ReadSecretAsync("secret/hello"));
             Assert.Equal("permission denied", exc.Message);
         }
 
-        private IVaultService VaultService() {
+        private DefaultVaultService VaultService() {
             return new VaultService(_vaultAddress);
         }
 
-        private async Task<IVaultService> AuthVaultService() {
+        private async Task<DefaultVaultService> AuthVaultService() {
             var token = "de24bef9-56f1-8391-98ce-f6fa9ab53df1";
-            var vault = new VaultService(_vaultAddress);
-            await vault.AuthenticateAsync(new TokenAuthentication(token)).ConfigureAwait(false);
+            var vault = new VaultService(_vaultAddress).AuthenticateUsingToken(token) as DefaultVaultService;
             return vault;
         }
     }

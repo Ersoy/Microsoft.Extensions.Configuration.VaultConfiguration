@@ -33,15 +33,12 @@ namespace HashiCorp.Vault {
 
         /// <inheritdoc />
         public abstract Task AuthenticateAsync(IVaultAuthentication vaultAuthentication);
+        
+        /// <inheritdoc />
+        public abstract Task<SecretBundle> ReadSecretAsync(string path, object payload = null);
 
         /// <inheritdoc />
-        public abstract Task<IDictionary<string, string>> ReadSecretDataAsync(string path);
-
-        /// <inheritdoc />
-        public abstract Task<SecretBundle> ReadSecretAsync(string path);
-
-        /// <inheritdoc />
-        public abstract Task<SecretBundle<T>> ReadSecretAsync<T>(string path);
+        public abstract Task<SecretBundle<T>> ReadSecretAsync<T>(string path, object payload = null);
 
         /// <inheritdoc />
         public abstract Task<IEnumerable<string>> ListAsync(string path);
@@ -52,7 +49,7 @@ namespace HashiCorp.Vault {
         /// <inheritdoc />
         public abstract Task<VaultHealthStatus> HealthStatusAsync();
 
-        protected virtual async Task<HttpResponseMessage> Request(string request) {
+        protected virtual async Task<HttpResponseMessage> GetAsync(string request) {
             if (string.IsNullOrWhiteSpace(request)) {
                 throw new ArgumentNullException(nameof(request));
             }
@@ -61,7 +58,7 @@ namespace HashiCorp.Vault {
                 if (AuthToken != null) {
                     Client.DefaultRequestHeaders.Add(XVaultToken, AuthToken.ToUnicodeString());
                 }
-
+                
                 var response = await Client.GetAsync(request).ConfigureAwait(false);
 
                 if (!response.IsSuccessStatusCode) {
@@ -86,19 +83,69 @@ namespace HashiCorp.Vault {
             }
         }
 
-        protected virtual async Task<SecretBundle> RequestSecret(string request) {
-            var response = await Request(request);
+        protected virtual async Task<HttpResponseMessage> PostAsync(string request, HttpContent payload) {
+            if (string.IsNullOrWhiteSpace(request)) {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            try {
+                if (AuthToken != null) {
+                    Client.DefaultRequestHeaders.Add(XVaultToken, AuthToken.ToUnicodeString());
+                }
+                
+                var response = await Client.PostAsync(request, payload).ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode) {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var r = JsonConvert.DeserializeObject<JObject>(json);
+
+                    var errors = r["errors"]?.Any() == true ? r["errors"] : null;
+
+                    if (errors?[0].ToString() == "missing client token") {
+                        throw new AuthenticationException(
+                            "Not authenticated (AuthenticateAsync is not invoked before making this request) to Vault.");
+                    }
+                    if (response.StatusCode == HttpStatusCode.Forbidden) {                        
+                        throw new HttpRequestException(errors?[0].ToString());
+                    }
+                }
+
+                return response;
+            }
+            finally {
+                Client.DefaultRequestHeaders.Remove(XVaultToken);
+            }
+        }
+
+        protected virtual async Task<SecretBundle> RequestSecret(string request, object payload = null) {
+            HttpResponseMessage response;
+
+            if (payload != null) {
+                response = await PostAsync(request, new StringContent(JsonConvert.SerializeObject(payload))).ConfigureAwait(false);
+            }
+            else {
+                response = await GetAsync(request).ConfigureAwait(false);
+            }
+
             response.EnsureSuccessStatusCode();
             var contentAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonConvert.DeserializeObject<SecretBundle>(contentAsString);
         }
 
-        protected virtual async Task<SecretBundle<T>> RequestSecret<T>(string request) {
-            var response = await Request(request);
+        protected virtual async Task<SecretBundle<T>> RequestSecret<T>(string request, object payload = null) {
+            HttpResponseMessage response;
+
+            if (payload != null) {
+                response = await PostAsync(request, new StringContent(JsonConvert.SerializeObject(payload))).ConfigureAwait(false);
+            }
+            else {
+                response = await GetAsync(request).ConfigureAwait(false);
+            }
+
             response.EnsureSuccessStatusCode();
             var contentAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonConvert.DeserializeObject<SecretBundle<T>>(contentAsString);
         }
     }
-
+    
 }

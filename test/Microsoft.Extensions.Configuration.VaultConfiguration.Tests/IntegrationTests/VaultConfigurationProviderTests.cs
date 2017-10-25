@@ -1,8 +1,6 @@
 using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using HashiCorp.Vault;
-using HashiCorp.Vault.Authentication;
+using HashiCorp.Vault.Authentication.Token;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -13,11 +11,10 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.Integratio
         private readonly Uri _vaultAddress = new Uri("http://127.0.0.1:8200");
 
         [Fact]
-        public async Task ReadConfiguration() {
+        public void ReadConfiguration() {
             var token = "de24bef9-56f1-8391-98ce-f6fa9ab53df1";
             var address = _vaultAddress;
-            var vault = new VaultService(address);
-            await vault.AuthenticateAsync(new TokenAuthentication(token)).ConfigureAwait(false);
+            var vault = new VaultService(address).AuthenticateUsingToken(token);            
 
             var configBuilder = new ConfigurationBuilder();
             configBuilder.Add(new VaultConfigurationSource(vault, "hello"));

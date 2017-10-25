@@ -28,8 +28,8 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
         private async Task Load(IEnumerable<string> secrets) {
             Data = new Dictionary<string, string>();
             foreach (var secret in secrets) {
-                var result = await Service.ReadSecretDataAsync(secret).ConfigureAwait(false);
-                Data.Add(DenormalizePath(secret), JsonConvert.SerializeObject(result));
+                var result = await Service.ReadSecretAsync(secret).ConfigureAwait(false);
+                Data.Add(DenormalizePath(secret), JsonConvert.SerializeObject(result.Data));
             }
         }
 

@@ -21,44 +21,33 @@ namespace HashiCorp.Vault {
         /// </summary>
         /// <param name="vaultAuthentication">Authentication token.</param>        
         Task AuthenticateAsync(IVaultAuthentication vaultAuthentication);
+        
+        /// <summary>
+        /// Read data as <see cref="SecretBundle"/> from Vault.
+        /// </summary>        
+        /// <param name="path">Path to a backend.</param>
+        /// <param name="payload">Payload to send.</param>
+        /// <returns>
+        /// Reads data at the given path from Vault.This can be used to read 
+        /// secrets and configuration as well as generate dynamic values from 
+        /// materialized backends. Please reference the documentation for the 
+        /// backends in use to determine key structure.
+        /// </returns>
+        Task<SecretBundle> ReadSecretAsync(string path, object payload = null);
 
         /// <summary>
-        /// Read data from Vault.
+        /// Read data as <see cref="SecretBundle"/> from Vault.
         /// </summary>
-        /// <typeparam name="T">Type of returned result.</typeparam>
+        /// <typeparam name="T">The type of the <code>Data</code> property.</typeparam>               
         /// <param name="path">Path to a backend.</param>
-        /// <returns>
-        /// Reads data at the given path from Vault. This can be used to read 
-        /// secrets and configuration as well as generate dynamic values from 
-        /// materialized backends. Please reference the documentation for the 
-        /// backends in use to determine key structure.
-        /// </returns>
-        Task<IDictionary<string, string>> ReadSecretDataAsync(string path);
-
-        /// <summary>
-        /// Read data as <see cref="SecretBundle"/> from Vault.
-        /// </summary>        
-        /// <param name="path">Path to a backend.</param>
+        /// <param name="payload">Payload to send.</param>
         /// <returns>
         /// Reads data at the given path from Vault.This can be used to read 
         /// secrets and configuration as well as generate dynamic values from 
         /// materialized backends. Please reference the documentation for the 
-        /// backends in use to determine key structure.
+        /// backends in use to determine key structure.        
         /// </returns>
-        Task<SecretBundle> ReadSecretAsync(string path);
-
-        /// <summary>
-        /// Read data as <see cref="SecretBundle"/> from Vault.
-        /// </summary>        
-        /// <param name="path">Path to a backend.</param>
-        /// <returns>
-        /// Reads data at the given path from Vault.This can be used to read 
-        /// secrets and configuration as well as generate dynamic values from 
-        /// materialized backends. Please reference the documentation for the 
-        /// backends in use to determine key structure.
-        /// <typeparam name="T">The type of the <code>Data</code> property.</typeparam>
-        /// </returns>
-        Task<SecretBundle<T>> ReadSecretAsync<T>(string path);
+        Task<SecretBundle<T>> ReadSecretAsync<T>(string path, object payload = null);
 
         /// <summary>
         /// List data from Vault.
