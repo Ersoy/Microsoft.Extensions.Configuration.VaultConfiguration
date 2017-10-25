@@ -48,6 +48,19 @@ namespace HashiCorp.Vault {
         Task<SecretBundle> ReadSecretAsync(string path);
 
         /// <summary>
+        /// Read data as <see cref="SecretBundle"/> from Vault.
+        /// </summary>        
+        /// <param name="path">Path to a backend.</param>
+        /// <returns>
+        /// Reads data at the given path from Vault.This can be used to read 
+        /// secrets and configuration as well as generate dynamic values from 
+        /// materialized backends. Please reference the documentation for the 
+        /// backends in use to determine key structure.
+        /// <typeparam name="T">The type of the <code>Data</code> property.</typeparam>
+        /// </returns>
+        Task<SecretBundle<T>> ReadSecretAsync<T>(string path);
+
+        /// <summary>
         /// List data from Vault.
         /// </summary>        
         /// <param name="path">Path to a backend.</param>
