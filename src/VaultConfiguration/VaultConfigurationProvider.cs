@@ -26,15 +26,17 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
             Load(secrets).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private async Task Load(IEnumerable<string> secrets) {
+        private async Task Load(IEnumerable<string> secrets)
+        {
             Data = new Dictionary<string, string>();
-            foreach (var secret in secrets) {
+            foreach (var secret in secrets)
+            {
                 var result = await Service.ReadSecretAsync(secret).ConfigureAwait(false);
 
                 if (result.Data.HasValues && result.Data.First is JProperty)
                 {
                     var property = (JProperty) result.Data.First;
-                    Data.Add(DenormalizePath(VaultPath.Combine(secret, property.Name)), (string)property.Value);
+                    Data.Add(DenormalizePath(VaultPath.Combine(secret, property.Name)), (string) property.Value);
                 }
                 Data.Add(DenormalizePath(secret), JsonConvert.SerializeObject(result.Data));
             }
