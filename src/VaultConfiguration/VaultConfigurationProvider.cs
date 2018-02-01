@@ -34,15 +34,15 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
             {
                 var result = await Service.ReadSecretAsync(secret).ConfigureAwait(false);
 
-                if (result.Data.HasValues && result.Data.First is JProperty)
+                foreach (var data in result.Data)
                 {
-                    var property = (JProperty) result.Data.First;
-                    if (property.Value.Type == JTokenType.String)
+                    if (data.Value.Type == JTokenType.String)
                     {
-                        Data.Add(DenormalizePath(VaultPath.Combine(secret, property.Name)), (string) property.Value);
-                    } else if (property.Value.Type == JTokenType.Array)
+                        Data.Add(DenormalizePath(VaultPath.Combine(secret, data.Key)), (string) data.Value);
+                    }
+                    else if (data.Value.Type == JTokenType.Array)
                     {
-                        Data.Add(DenormalizePath(VaultPath.Combine(secret, property.Name)), JsonConvert.SerializeObject(property.Value));
+                        Data.Add(DenormalizePath(VaultPath.Combine(secret, data.Key)), JsonConvert.SerializeObject(data.Value));
                     }
                 }
             }

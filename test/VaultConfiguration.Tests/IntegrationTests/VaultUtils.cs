@@ -23,8 +23,12 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.Integratio
 
         public void Write(string path, string key, string value)
         {
+            Write(path, new Dictionary<string, string> {{key, value}});
+        }
+
+        public void Write(string path, Dictionary<string,string> data)
+        {
             var uri = new Uri($"{m_address}/v1/secret/{path}");
-            var data= new Dictionary<string, string> {{key, value}};
 
             using (var client = new HttpClient())
             {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using HashiCorp.Vault;
@@ -125,6 +126,41 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.Integratio
             Assert.Equal(3, foodTypes.Length);
             Assert.Equal("arepas", foodTypes[1]);
         }
+
+        [Fact]
+        public void CanReadMultipleKeys() {
+            // GIVEN settings at secret/hello/level1 and level2
+            m_vaultUtils.Write("hello/fishies", new Dictionary<string, string> {{"count", "13"}, {"species", "zebrafish"}});
+
+            // WHEN settings are retrieved
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.Add(new VaultConfigurationSource(m_vault, "hello"));
+            
+            var config = configBuilder.Build();
+            var count = config["fishies:count"];
+            var species = config["fishies:species"];
+
+            // THEN the values match!
+            Assert.Equal("13", count);
+            Assert.Equal("zebrafish", species);
+        }
+
+        [Fact]
+        public void ReadsNonExistentKey()
+        {
+            // GIVEN no settings
+
+            // WHEN settings are retrieved
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.Add(new VaultConfigurationSource(m_vault, "hello"));
+            
+            var config = configBuilder.Build();
+            var value = config["setting:count"];
+
+            // THEN the values should be null
+            Assert.Null(value);
+        }
+
     }
 
 }
