@@ -109,13 +109,21 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.Integratio
         }
 
         [Fact]
-        public void CanReadSimpleObject()
+        public void CanReadCollection()
         {
+            // GIVEN array setting value at secret/hello/foods 
+            m_vaultUtils.Write("hello/foods", "types", new object[]{"tacos", "arepas", "chili"});
+
+            // WHEN setting is retrieved
             var configBuilder = new ConfigurationBuilder();
             configBuilder.Add(new VaultConfigurationSource(m_vault, "hello"));
             
             var config = configBuilder.Build();
+            var foodTypes = JsonConvert.DeserializeObject<string[]>(config["foods:types"]);
 
+            // THEN the values match!
+            Assert.Equal(3, foodTypes.Length);
+            Assert.Equal("arepas", foodTypes[1]);
         }
     }
 

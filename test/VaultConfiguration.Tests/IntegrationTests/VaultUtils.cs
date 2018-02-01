@@ -24,14 +24,26 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.Integratio
         public void Write(string path, string key, string value)
         {
             var uri = new Uri($"{m_address}/v1/secret/{path}");
-            var dataAsJson = JsonConvert.SerializeObject(new Dictionary<string, string> {{key, value}});
+            var data= new Dictionary<string, string> {{key, value}};
 
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("X-Vault-Token", m_token);
-                var response = client.PostAsJsonAsync(uri, new Dictionary<string, string> { { key, value } }).ConfigureAwait(false).GetAwaiter().GetResult();
-                var responseBody = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                client.PostAsJsonAsync(uri, data).ConfigureAwait(false).GetAwaiter().GetResult();
             }
+        }
+
+        public void Write(string path, string key, object[] values)
+        {
+            var uri = new Uri($"{m_address}/v1/secret/{path}");
+            var data= new Dictionary<string, object[]> {{key, values}};
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("X-Vault-Token", m_token);
+                client.PostAsJsonAsync(uri, data).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            
         }
     }
 }

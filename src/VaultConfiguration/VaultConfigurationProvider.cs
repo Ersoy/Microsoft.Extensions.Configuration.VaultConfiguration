@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HashiCorp.Vault;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.Extensions.Configuration.VaultConfiguration {
 
@@ -36,9 +37,14 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
                 if (result.Data.HasValues && result.Data.First is JProperty)
                 {
                     var property = (JProperty) result.Data.First;
-                    Data.Add(DenormalizePath(VaultPath.Combine(secret, property.Name)), (string) property.Value);
+                    if (property.Value.Type == JTokenType.String)
+                    {
+                        Data.Add(DenormalizePath(VaultPath.Combine(secret, property.Name)), (string) property.Value);
+                    } else if (property.Value.Type == JTokenType.Array)
+                    {
+                        Data.Add(DenormalizePath(VaultPath.Combine(secret, property.Name)), JsonConvert.SerializeObject(property.Value));
+                    }
                 }
-                Data.Add(DenormalizePath(secret), JsonConvert.SerializeObject(result.Data));
             }
         }
 
