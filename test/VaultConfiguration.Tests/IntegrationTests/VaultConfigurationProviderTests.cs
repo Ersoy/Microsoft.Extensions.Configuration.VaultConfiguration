@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using HashiCorp.Vault;
 using HashiCorp.Vault.Authentication.Token;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.IntegrationTests

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using HashiCorp.Vault;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.Extensions.Configuration.VaultConfiguration {
 

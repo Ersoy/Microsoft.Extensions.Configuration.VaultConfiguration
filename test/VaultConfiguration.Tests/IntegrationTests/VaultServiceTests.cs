@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using HashiCorp.Vault;
-using HashiCorp.Vault.Authentication;
 using HashiCorp.Vault.Authentication.Token;
 using Xunit;
 
