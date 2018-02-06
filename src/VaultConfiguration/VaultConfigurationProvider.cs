@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HashiCorp.Vault;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Extensions.Configuration.VaultConfiguration {
 
@@ -25,11 +26,24 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
             Load(secrets).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private async Task Load(IEnumerable<string> secrets) {
+        private async Task Load(IEnumerable<string> secrets)
+        {
             Data = new Dictionary<string, string>();
-            foreach (var secret in secrets) {
+            foreach (var secret in secrets)
+            {
                 var result = await Service.ReadSecretAsync(secret).ConfigureAwait(false);
-                Data.Add(DenormalizePath(secret), JsonConvert.SerializeObject(result.Data));
+
+                foreach (var data in result.Data)
+                {
+                    if (data.Value.Type == JTokenType.String)
+                    {
+                        Data.Add(DenormalizePath(VaultPath.Combine(secret, data.Key)), (string) data.Value);
+                    }
+                    else if (data.Value.Type == JTokenType.Array)
+                    {
+                        Data.Add(DenormalizePath(VaultPath.Combine(secret, data.Key)), JsonConvert.SerializeObject(data.Value));
+                    }
+                }
             }
         }
 
@@ -54,15 +68,21 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration {
         }
 
         public override bool TryGet(string key, out string value) {
-            return Data.TryGetValue(key, out value);
+            // return Data.TryGetValue(key, out value);
+            return Data.TryGetValue(key.Replace($"secret:{Prefix}:", string.Empty), out value);
         }
 
         protected virtual string NormalizePath(string path) {
             return string.IsNullOrWhiteSpace(path) ? path : path.Replace(ConfigurationPath.KeyDelimiter, VaultPath.PathDelimiter);
         }
 
-        protected virtual string DenormalizePath(string path) {
-            return string.IsNullOrWhiteSpace(path) ? path : path.Replace(VaultPath.PathDelimiter, ConfigurationPath.KeyDelimiter);
+        protected virtual string DenormalizePath(string path)
+        {
+            return string.IsNullOrWhiteSpace(path)
+                ? path
+                : path
+                    .Replace(VaultPath.PathDelimiter, ConfigurationPath.KeyDelimiter)
+                    .Replace($"secret{ConfigurationPath.KeyDelimiter}{Prefix}{ConfigurationPath.KeyDelimiter}", string.Empty);
         }
 
     }
