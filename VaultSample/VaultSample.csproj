@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\HashiCorp.Vault\HashiCorp.Vault.csproj" />
-    <ProjectReference Include="..\src\Microsoft.Extensions.Configuration.VaultConfiguration\Microsoft.Extensions.Configuration.VaultConfiguration.csproj" />
+    <ProjectReference Include="..\src\VaultConfiguration\Microsoft.Extensions.Configuration.VaultConfiguration.csproj" />
   </ItemGroup>
 
 </Project>
