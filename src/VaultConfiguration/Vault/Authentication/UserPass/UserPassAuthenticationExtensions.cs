@@ -1,6 +1,4 @@
-using System.Threading.Tasks;
-
-namespace HashiCorp.Vault.Authentication.UserPass {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication.UserPass {
 
     public static class UserPassAuthenticationExtensions {
 

@@ -2,19 +2,19 @@ using System;
 using System.Net.Http;
 using System.Security;
 using System.Threading.Tasks;
-using HashiCorp.Vault.Models;
-using HashiCorp.Vault.Utilities;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Models;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Utilities;
 using Newtonsoft.Json;
 
-namespace HashiCorp.Vault.Authentication.UserPass {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication.UserPass {
 
     /// <summary>
     /// Represents the 'userpass' authentication.
     /// </summary>
     public class UserPassAuthentication : IVaultAuthentication {
 
-        private SecureString _userName;
-        private SecureString _password;
+        private SecureString m_userName;
+        private SecureString m_password;
 
         public UserPassAuthentication(IVaultService vaultService) {
             VaultService = vaultService ?? throw new ArgumentNullException(nameof(vaultService));
@@ -28,15 +28,15 @@ namespace HashiCorp.Vault.Authentication.UserPass {
         /// <param name="userName">User name.</param>
         /// <param name="password">Password.</param>
         public void Credentials(string userName, string password) {
-            _userName = userName.ToSecureString();
-            _password = password.ToSecureString();
+            m_userName = userName.ToSecureString();
+            m_password = password.ToSecureString();
         }
 
         public async Task<SecureString> AuthenticateAsync() {
             var response = await VaultService.Client.PostAsync(
-                $"auth/userpass/login/{_userName.ToUnicodeString()}",
+                $"auth/userpass/login/{m_userName.ToUnicodeString()}",
                 new StringContent(
-                    JsonConvert.SerializeObject(new {password = _password.ToUnicodeString()})));
+                    JsonConvert.SerializeObject(new {password = m_password.ToUnicodeString()})));
 
             response.EnsureSuccessStatusCode();
 

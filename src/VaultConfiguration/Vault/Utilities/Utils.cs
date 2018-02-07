@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace HashiCorp.Vault.Utilities {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Utilities {
 
     internal static class Utils {
 

@@ -2,8 +2,8 @@ using System;
 using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using HashiCorp.Vault;
-using HashiCorp.Vault.Authentication.Token;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication.Token;
 using Xunit;
 
 namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.IntegrationTests {

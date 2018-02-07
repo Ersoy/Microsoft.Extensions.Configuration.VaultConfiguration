@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace HashiCorp.Vault {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault {
 
     public class HttpException : Exception {
 

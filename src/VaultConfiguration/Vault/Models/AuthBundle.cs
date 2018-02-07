@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace HashiCorp.Vault.Models {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Models {
 
     [DataContract]
     public class AuthBundle {

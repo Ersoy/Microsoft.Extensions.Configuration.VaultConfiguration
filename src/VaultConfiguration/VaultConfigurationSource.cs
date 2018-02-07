@@ -1,5 +1,5 @@
 ﻿using System;
-using HashiCorp.Vault;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault;
 
 namespace Microsoft.Extensions.Configuration.VaultConfiguration {
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HashiCorp.Vault;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

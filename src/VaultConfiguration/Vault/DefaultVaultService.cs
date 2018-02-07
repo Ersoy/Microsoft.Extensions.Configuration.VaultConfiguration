@@ -6,13 +6,13 @@ using System.Net;
 using System.Net.Http;
 using System.Security;
 using System.Threading.Tasks;
-using HashiCorp.Vault.Authentication;
-using HashiCorp.Vault.Models;
-using HashiCorp.Vault.Utilities;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Models;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace HashiCorp.Vault {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault {
 
     /// <summary>
     /// Default implementation of the <see cref="IVaultService"/> interface.

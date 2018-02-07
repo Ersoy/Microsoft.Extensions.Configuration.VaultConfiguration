@@ -1,4 +1,4 @@
-namespace HashiCorp.Vault.Authentication.Token {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication.Token {
 
     public static class TokenAuthenticationExtensions {
 

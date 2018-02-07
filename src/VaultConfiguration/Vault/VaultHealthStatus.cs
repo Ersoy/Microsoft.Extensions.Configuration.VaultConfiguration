@@ -1,4 +1,4 @@
-﻿namespace HashiCorp.Vault {
+﻿namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault {
 
     public enum VaultHealthStatus {
         Unknown,

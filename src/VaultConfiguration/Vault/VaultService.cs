@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using HashiCorp.Vault.Authentication;
-using HashiCorp.Vault.Models;
-using HashiCorp.Vault.Utilities;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Models;
 using Newtonsoft.Json;
 
-namespace HashiCorp.Vault {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault {
 
     /// <inheritdoc />
     public class VaultService : DefaultVaultService {

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using HashiCorp.Vault;
-using HashiCorp.Vault.Authentication.Token;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication.Token;
 using Newtonsoft.Json;
 using Xunit;
 

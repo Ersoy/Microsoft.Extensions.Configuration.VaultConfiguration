@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
 
-namespace HashiCorp.Vault.Models {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Models {
 
     [DataContract]
     public class SecretBundle {

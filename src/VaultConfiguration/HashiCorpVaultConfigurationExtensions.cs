@@ -1,7 +1,7 @@
 ﻿using System;
-using HashiCorp.Vault;
-using HashiCorp.Vault.Authentication.Token;
-using HashiCorp.Vault.Authentication.UserPass;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication.Token;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication.UserPass;
 
 namespace Microsoft.Extensions.Configuration.VaultConfiguration {
 

@@ -1,7 +1,7 @@
 ﻿using System.Security;
 using System.Threading.Tasks;
 
-namespace HashiCorp.Vault.Authentication {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication {
 
     /// <summary>
     /// Represents a vault authenticationn.

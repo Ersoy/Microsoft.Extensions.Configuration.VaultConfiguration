@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Security;
 using System.Threading.Tasks;
-using HashiCorp.Vault.Models;
-using HashiCorp.Vault.Utilities;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Utilities;
 
-namespace HashiCorp.Vault.Authentication.Token {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication.Token {
 
     /// <summary>
     /// Represents a token authentication.
     /// </summary>
     public class TokenAuthentication : IVaultAuthentication {
-        private readonly SecureString _vaultToken;
+        private readonly SecureString m_vaultToken;
 
         /// <summary>
         /// Sets the vault authentication token.
@@ -19,13 +18,13 @@ namespace HashiCorp.Vault.Authentication.Token {
         /// <param name="vaultToken">The vault token.</param>
         public TokenAuthentication(DefaultVaultService vaultService, string vaultToken) {
             VaultService = vaultService ?? throw new ArgumentNullException(nameof(vaultService));
-            _vaultToken = vaultToken.ToSecureString();
+            m_vaultToken = vaultToken.ToSecureString();
         }
 
         public DefaultVaultService VaultService { get; }
 
         public Task<SecureString> AuthenticateAsync() {
-            return Task.FromResult(_vaultToken);
+            return Task.FromResult(m_vaultToken);
             //var response = await VaultService.ReadSecretAsync($"auth/token/lookup/{_vaultToken.ToUnicodeString()}").ConfigureAwait(false);
             //var authBundle = response.Data.ToObject<AuthBundle>();
             //return authBundle.Token.ToSecureString();

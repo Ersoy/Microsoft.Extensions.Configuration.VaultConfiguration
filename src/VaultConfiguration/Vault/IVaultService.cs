@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using HashiCorp.Vault.Authentication;
-using HashiCorp.Vault.Models;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Authentication;
+using Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Models;
 
-namespace HashiCorp.Vault {
+namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault {
 
     /// <summary>
     /// The vault service. This is the entry point for vault communication.
