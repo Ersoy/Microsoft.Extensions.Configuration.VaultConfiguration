@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Vault.Utilities 
                 return Marshal.PtrToStringUni(ptr);
             }
             finally {
-                Marshal.Release(ptr);
+                Marshal.ZeroFreeGlobalAllocUnicode(ptr);
             }
         }
 
