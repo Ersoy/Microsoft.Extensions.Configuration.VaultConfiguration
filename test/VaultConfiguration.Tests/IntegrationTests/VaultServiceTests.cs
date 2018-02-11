@@ -34,7 +34,7 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.Integratio
 
         [Fact]
         public async Task ReadSecret() {
-            var vault = await AuthVaultService();
+            var vault = AuthVaultService();
             var secret = await vault.ReadSecretAsync("secret/hello");
             Assert.Equal("world", secret.Data["value"].ToString());
         }
@@ -51,7 +51,7 @@ namespace Microsoft.Extensions.Configuration.VaultConfiguration.Tests.Integratio
             return new VaultService(_vaultAddress);
         }
 
-        private async Task<DefaultVaultService> AuthVaultService() {
+        private DefaultVaultService AuthVaultService() {
             var token = "de24bef9-56f1-8391-98ce-f6fa9ab53df1";
             var vault = new VaultService(_vaultAddress).AuthenticateUsingToken(token) as DefaultVaultService;
             return vault;
